@@ -193,6 +193,8 @@ def main(
         specified in folders.keys().
     """
 
+    pd.set_option('display.max_rows', 500) # not sure if this is the best spot for this?
+
     if replace:
         arguments = misc.get_arguments(main, locals())
         assert all([value in [False, None] for name, value in arguments.items() if name != 'replace']), (
