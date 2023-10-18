@@ -1,13 +1,11 @@
-from typing import List
+from typing import List, Dict
 
 from .classes.folder import Folder
-
 
 PATH_TO_BUDGET = '/Users/tesslinden/Dropbox/Misc/! Financial/transactions/budget.csv'
 PATH_TO_PLOTS = '/Users/tesslinden/Dropbox/Misc/! Financial/transactions/plots'
 PATH_TO_TRANSACTIONS = '/Users/tesslinden/Dropbox/Misc/! Financial/transactions'
 
-# Store them in a list or dictionary for easier access
 folders_list: List[Folder]= [
     Folder(
         name='asav',
@@ -72,3 +70,5 @@ folders_list: List[Folder]= [
         ),
     ),
 ]
+
+folders_dict: Dict[str,Folder] = {folder.name: folder for folder in folders_list}
