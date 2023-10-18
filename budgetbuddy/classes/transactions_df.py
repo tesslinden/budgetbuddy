@@ -712,3 +712,26 @@ class TransactionsDF():
         parts_of_path = [self.folder.path, self.filename] 
         if any([part is None for part in parts_of_path]): return None
         return '/'.join(parts_of_path)
+    
+
+def assert_compatible_dates(tdf: TransactionsDF):
+    """Raises an exception if the 'date' and 'date_override' columns of the TransactionsDF are incompatible 
+    (i.e. if there are rows where 'date_override' is not None and 'date_override' != 'date').
+    """
+    copy = tdf.copy()
+    copy.override_dates()
+    assert (copy.df['date'] == tdf.df['date']).all(), (
+        f"Incompatible values of date and date_override detected in file '{tdf.filename}': \n" +
+        f"{tdf.df.loc[copy.df['date'] != tdf.df['date'], ['date_orig','date_override','date','transaction','amount','account']]}"
+    )
+
+
+def assert_no_duplicate_rows(tdf: TransactionsDF, subset: List[str] = None):
+    """Raises an exception if there are duplicate rows in the TransactionsDF. 'subset' argument is a list of column names 
+    to be passed to the pandas.DataFrame.duplicated method."""
+    subset = subset or tdf.df.columns.tolist()
+    duplicate_transactions = TransactionsDF(data=tdf.df[tdf.df.duplicated(subset=subset, keep=False)])
+    assert len(duplicate_transactions) == 0, (
+        f"Duplicate transactions are not supported in file '{tdf.filename}'. The duplicate transactions are:\n" +
+        f"{duplicate_transactions.copy(cols=subset)}"
+    )
