@@ -1,3 +1,4 @@
+import os
 from typing import List, Dict
 
 from .classes.folder import Folder
@@ -5,6 +6,9 @@ from .classes.folder import Folder
 PATH_TO_BUDGET = '/Users/tesslinden/Dropbox/Misc/! Financial/transactions/budget.csv'
 PATH_TO_PLOTS = '/Users/tesslinden/Dropbox/Misc/! Financial/transactions/plots'
 PATH_TO_TRANSACTIONS = '/Users/tesslinden/Dropbox/Misc/! Financial/transactions'
+
+for path in [PATH_TO_BUDGET, PATH_TO_PLOTS, PATH_TO_TRANSACTIONS]:
+    assert os.path.exists(path), f"Invalid path: '{path}'"
 
 FOLDERS_LIST: List[Folder]= [
     Folder(
@@ -72,3 +76,6 @@ FOLDERS_LIST: List[Folder]= [
 ]
 
 FOLDERS_DICT: Dict[str,Folder] = {folder.name: folder for folder in FOLDERS_LIST}
+
+for folder in FOLDERS_LIST:
+    assert os.path.exists(folder.path), f"Invalid path: '{folder.path}'"
