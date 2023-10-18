@@ -1,4 +1,5 @@
 import os
+from typing import Dict, List, Tuple
 
 import pandas as pd
 import re
@@ -6,6 +7,7 @@ import re
 from .. import config
 from ..classes.folder import Folder
 from ..classes.transactions_df import TransactionsDF
+from ..classes.transactions_df import assert_compatible_dates, assert_no_duplicate_rows
 
 
 def FromCsvTransactionsDF(**kwargs) -> TransactionsDF:
@@ -188,3 +190,155 @@ def get_max_filename(
     )
 
     return max_filename
+
+
+def concat_all_unannotated(
+    prune_tdf: TransactionsDF = None,
+) -> Tuple[TransactionsDF, List[str]]: 
+    """Imports all unannotated transactions from all folders in folders.keys() (except 'merged') and 
+    concatenates them into a single TransactionsDF.
+    If prune_tdf is not None, prune_tdf is passed to the prune_external_duplicates method of each TransactionsDF.
+    Returns the concatenated TransactionsDF and a list of the filenames of the imported transactions.
+    """
+
+    merged_filename = 'merged'
+    transaction_dfs = []
+    num_dfs = 0
+    for folder in config.FOLDERS_LIST:
+        if folder.name == 'merged': continue
+        filenames = [filename for filename in os.listdir(folder.path) if filename.startswith(folder.prefix)]
+        if len(filenames) == 0: continue
+        if folder.suffix == '.txt':
+            new_dfs = [FromTxtTransactionsDF(folder=folder,filename=filename) for filename in filenames]
+        elif folder.suffix == '.xlsx':
+            new_dfs = [FromExcelTransactionsDF(folder=folder,filename=filename) for filename in filenames]
+        else:
+            new_dfs = [FromCsvTransactionsDF(folder=folder,filename=filename) for filename in filenames]
+        for new_df in new_dfs:
+            new_df.df['filename'] = new_df.filename
+            if prune_tdf: 
+                if folder=='manual': 
+                    new_df.prune_external_duplicates(prune_tdf, subset=['date_orig','date','transaction','account','amount'])
+                else: 
+                    new_df.prune_external_duplicates(prune_tdf)
+        transaction_dfs.extend([new_df for new_df in new_dfs if len(new_df) > 0])
+        new_num_dfs = len(transaction_dfs)
+        if new_num_dfs > num_dfs: 
+            merged_filename = merged_filename + '_' + get_max_filename(folder,folder.prefix,folder.suffix)[:-4]
+        num_dfs = len(transaction_dfs)
+        
+    if len(transaction_dfs) == 0:
+        return TransactionsDF(data=pd.DataFrame()), []
+
+    concat_df = pd.concat([transaction_df.df for transaction_df in transaction_dfs], ignore_index=True)
+    concat_filenames = concat_df['filename'].unique().tolist()
+    concat_filenames.sort()
+    concat_transactions = TransactionsDF(data=concat_df, folder=config.FOLDERS_DICT['merged'], filename=merged_filename+'.csv') 
+    
+    return concat_transactions, concat_filenames
+
+
+def merge_all(write: bool = True) -> TransactionsDF:
+    """Imports all unannotated transactions from all non-'merged' folders in folders.keys(), prunes them 
+    against the latest merged transactions file, and concatenates them into a single unannotated TransactionsDF.
+    Prunes internal duplicates from the unannotated transactions, then calls annotate_all to annotate the unannotated 
+    transactions. Concatenates the newly annotated and previously annotated transactions into a new merged 
+    TransactionsDF and writes it to a csv file in the 'merged' folder.
+    """
+
+    # 0. import latest file of previous merged transactions
+    print("\nImporting latest merged transactions file...")
+    annotated = FromCsvTransactionsDF(folder=config.FOLDERS_DICT['merged']) 
+    annotated.sort_transactions()
+    print(f"Imported {annotated.filename}.")
+
+    # 0.5. if there are transactions in merged that have been deleted from manual.xlsx, delete them from annotated df
+    print("\nChecking for deleted manual transactions...")
+    manual = FromExcelTransactionsDF(folder=config.FOLDERS_DICT['manual'])
+    assert_compatible_dates(manual)
+    assert_no_duplicate_rows(manual, subset=[col for col in manual.df.columns if col not in ['date_override','date_orig']])
+    manual.sort_transactions()
+
+    annotated_pruned = pd.merge(
+        left=annotated.df,
+        right=manual.df, 
+        on=['date','date_orig','date_override','transaction','category','amount','account','budgeted','exclude'],
+        how='left', 
+        suffixes=[None, '_drop'],
+        indicator=True,
+    )
+    deleted_transactions_index = annotated_pruned.query("filename == 'manual.xlsx' and _merge == 'left_only'").index
+    deleted_transactions = TransactionsDF(data=annotated_pruned.loc[deleted_transactions_index])
+    if len(deleted_transactions) > 0:
+        print(f"\nThe following {len(deleted_transactions)} transactions were not found in manual.xlsx and will be deleted:")
+        print(deleted_transactions.copy(cols=TransactionsDF.DISPLAY_COLUMNS_NAMES))
+        response = ''
+        while response not in ['y', 'n']:
+            response = input("Accept these deletions? y/n\t")
+            if response == 'y':
+                columns_to_drop = [col for col in annotated_pruned.columns if '_drop' in col or col=='_merge']
+                annotated.df = annotated_pruned.drop(deleted_transactions_index).drop(columns=columns_to_drop)
+                print(f"{len(deleted_transactions)} transaction(s) will be deleted.")
+            elif response == 'n':
+                deleted_transactions = TransactionsDF()
+                print("\nNo transactions will be deleted.")
+    else:
+        print("No deleted manual transactions were found.")
+
+    # 1. import ALL raw files: relay, avis, asav, manual; prune transactions that are already in annotated df
+    print("\nImporting unannotated transactions files & pruning them against the annotated transactions...")
+    unannotated, unannotated_filenames = concat_all_unannotated(prune_tdf=annotated if len(annotated) > 0 else None)
+    unannotated.sort_transactions()
+    if len(unannotated) == 0: 
+        print("No new transactions were found.")
+        if len(deleted_transactions) > 0: 
+            print("\nSaving file with deleted manual transactions...")
+            annotated.to_csv()
+        return annotated
+    else:
+        print(f"Imported {len(unannotated)} new transaction(s) from {len(unannotated_filenames)} file(s): " + 
+              f"{unannotated_filenames}")
+        print("\nNew transactions:")
+        print(unannotated.copy(cols=TransactionsDF.DISPLAY_COLUMNS_NAMES).category_to_bottom('transfers'))
+
+    # 2. prune internal duplicates
+    unannotated.prune_internal_duplicates()
+
+    # 3. add category, exclude, date_override, budgeted, and subcategory annotation columns
+    unannotated.annotate_all()
+    unannotated.sort_transactions()
+    
+    print("\nNew rows to be added:")
+    print(unannotated.copy(cols=TransactionsDF.DISPLAY_COLUMNS_NAMES).column_to_last('filename').category_to_bottom('transfers'))
+    print("\nRows to be deleted:")
+    if len(deleted_transactions) > 0:
+        print(deleted_transactions.copy(cols=TransactionsDF.DISPLAY_COLUMNS_NAMES).column_to_last('filename').category_to_bottom('transfers'))
+    else:
+        print("None")
+
+    response = ''
+    while response not in ['y','n']:
+        response = input("\nSave these changes? (y/n) ").lower() # TODO: add option for user to ask for more columns to be displayed
+        if response == 'n': 
+            confirm = input("All changes will be lost. Type n again to confirm (or type anything else to go back)\t").lower()
+            if confirm == 'n': return annotated
+            else: response = ''
+
+    #4. concat annotated & newly annotated
+    if sorted(list(annotated.df.columns)) != sorted(list(unannotated.df.columns)):
+        print("WARNING: annotated and newly_annotated tdfs have different columns: "+(
+            f"{annotated.df.columns=} vs. {unannotated.df.columns=}"))
+
+    merged = TransactionsDF(data=pd.concat([annotated.df, unannotated.df], ignore_index=True), folder=config.FOLDERS_DICT['merged'])
+    merged.set_merged_filename()
+    merged.sort_transactions()
+    if write: merged.to_csv()
+    return merged
+
+
+def string_to_list_of_strings(s: str) -> List[str]: # TODO: use this for name_test, desctest etc
+    """Converts the string "['a', 'b', 'c']" to the list ['a', 'b', 'c'] etc.
+    Quotes within the list string can be single or double quotes.
+    """
+    list_without_brackets = s[1:-1]
+    return [s[1:-1] for s in list_without_brackets.split(',')]
