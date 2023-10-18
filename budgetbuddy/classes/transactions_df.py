@@ -5,10 +5,9 @@ import numpy as np
 import pandas as pd
 import re
 
-from . import Column
-from . import Folder
+from .column import Column
+from .folder import Folder
 from .. import config
-from ..utils import importing
 from ..utils import misc
 
 class TransactionsDF():
@@ -272,6 +271,8 @@ class TransactionsDF():
     ):
         """TODO: Write docstring"""
 
+        from ..utils.importing import get_matching_row_of_budget
+
         def restart_annotation(locals):
             print("Restarting...")
             arguments = misc.get_arguments(TransactionsDF.annotate_column, locals)
@@ -334,7 +335,7 @@ class TransactionsDF():
                 for row in rows_needing_annotation:
                     name = copy.df.loc[row, 'transaction']
                     amount = copy.df.loc[row, 'amount']
-                    row_of_budget = importing.get_matching_row_of_budget(budget, name, amount)
+                    row_of_budget = get_matching_row_of_budget(budget, name, amount)
                     if row_of_budget is not None: 
                         copy.df.loc[row, column.name] = budget.loc[row_of_budget, column.name]
             elif annotate_automatically_with_dict:
@@ -603,14 +604,17 @@ class TransactionsDF():
 
     def set_merged_filename(self):
         """TODO: write docstring"""
+
+        from ..utils.importing import get_max_filename
+
         if self.folder.name != 'merged':
             print("WARNING: set_merged_filename() should only be called on a TransactionsDF in the 'merged' folder.")
             return
         #TODO: improve the system for naming merged files
-        max_avis_filename = importing.get_max_filename(config.FOLDERS_DICT['avis']).replace('.csv','')
-        max_asav_filename = importing.get_max_filename(config.FOLDERS_DICT['asav']).replace('.csv','')
-        max_manual_filename = importing.get_max_filename(config.FOLDERS_DICT['manual']).replace('.xlsx','')
-        max_relay_filename =  importing.get_max_filename(config.FOLDERS_DICT['relay']).replace('.txt','')
+        max_avis_filename = get_max_filename(config.FOLDERS_DICT['avis']).replace('.csv','')
+        max_asav_filename = get_max_filename(config.FOLDERS_DICT['asav']).replace('.csv','')
+        max_manual_filename = get_max_filename(config.FOLDERS_DICT['manual']).replace('.xlsx','')
+        max_relay_filename =  get_max_filename(config.FOLDERS_DICT['relay']).replace('.txt','')
         merged_filename = 'merged_'+'_'.join([max_relay_filename,max_avis_filename,max_asav_filename,max_manual_filename])+'.csv'
         self.filename = merged_filename
 
