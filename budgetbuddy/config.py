@@ -6,7 +6,7 @@ PATH_TO_BUDGET = '/Users/tesslinden/Dropbox/Misc/! Financial/transactions/budget
 PATH_TO_PLOTS = '/Users/tesslinden/Dropbox/Misc/! Financial/transactions/plots'
 PATH_TO_TRANSACTIONS = '/Users/tesslinden/Dropbox/Misc/! Financial/transactions'
 
-folders_list: List[Folder]= [
+FOLDERS_LIST: List[Folder]= [
     Folder(
         name='asav',
         prefix='History',
@@ -71,4 +71,4 @@ folders_list: List[Folder]= [
     ),
 ]
 
-folders_dict: Dict[str,Folder] = {folder.name: folder for folder in folders_list}
+FOLDERS_DICT: Dict[str,Folder] = {folder.name: folder for folder in FOLDERS_LIST}
