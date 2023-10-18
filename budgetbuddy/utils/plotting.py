@@ -2,7 +2,6 @@ import calendar
 from datetime import datetime
 from typing import Dict, List, Tuple, Union
 
-import brewer2mpl
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
@@ -82,6 +81,9 @@ def plot_all(
     Bottom middle: total savings barplot
     Bottom right: total spending barplot
     """
+
+    matplotlib.rcParams['font.sans-serif'] = "Arial"
+    matplotlib.rcParams['font.family'] = "sans-serif"
 
     print("\nMaking plots...")
 
