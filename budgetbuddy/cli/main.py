@@ -1,10 +1,9 @@
 import fire
 
-from .. import utils # to use functions from the utils folder, e.g. my_function() in the importing.py file, call them like so: utils.importing.my_function()
 from .. import config
-from classes.folder import Folder
-from classes.column import Column
-from classes.transactions_df import TransactionsDF
+from .. import utils # to use functions from the utils folder, e.g. my_function() in the importing.py file, call them like so: utils.importing.my_function()
+from ..classes.column import Column
+from ..classes.folder import Folder
 
 class BudgetBuddyCLI:
 
