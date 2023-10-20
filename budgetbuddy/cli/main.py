@@ -170,7 +170,11 @@ def display_filtered_transactions(
     export: bool = False,
     timestamp: datetime = datetime.today(),
 ):
-    """TODO: write docstring"""
+    """
+    Calls TransactionsDF.filter() using the specified query and displays the results. If sort_by is specified, sorts the
+    results by the specified columns. If show_sum is True, displays the sum of the amounts of the results. If export is
+    True, exports the results to a csv file in the 'exported' folder.
+    """
 
     if display_columns is None: display_columns = TransactionsDF.DISPLAY_COLUMNS_NAMES.copy()
 
