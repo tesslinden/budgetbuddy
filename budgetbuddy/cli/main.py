@@ -220,7 +220,9 @@ def find_replace(
     find: str = None,
     replace: str = None,
 ):
-    """TODO: write docstring"""
+    """Finds and replaces all instances of the specified strings in all non-xlsx files with the expected prefixes in
+    the folders specified in config.FOLDERS_LIST. 
+    """
     for folder in config.FOLDERS_LIST:
         files = [file for file in os.listdir(folder.path) if file.startswith(folder.prefix) and not file.endswith('.xlsx')] 
         files.sort()
