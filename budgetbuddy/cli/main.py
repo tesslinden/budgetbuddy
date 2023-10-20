@@ -27,7 +27,7 @@ def BudgetBuddyCLI(
     replace: Dict[str,str] = None,
 ):
     """
-    TODO: top-line docstring
+    BudgetBuddyCLI is a command line interface for the BudgetBuddy package. 
 
     -m, --merge: bool = None
         Creates a new merged transactions file by importing any new transactions from non-'merged' folders and merging 
