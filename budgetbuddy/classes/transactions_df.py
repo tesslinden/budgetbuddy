@@ -57,7 +57,13 @@ class TransactionsDF():
     }
     
     CATEGORIES_SUBCATEGORIES_SEARCHTERMS: Dict[str,Dict] = {
-        'bills & utilities': {},
+        'bills & utilities': {
+            'cell': ['verizon', 'vzw'],
+            'internet': ['comcast', 'xfinity', 'internet'],
+            'pge': ['pge','pgande', 'pg&e'],
+            'rent': ['rent'],
+            'other': [],
+        },
         'dining & drinks': {},
         'entertainment': {},
         'gifts & donations': {
