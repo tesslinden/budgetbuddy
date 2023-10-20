@@ -209,7 +209,7 @@ def display_filtered_transactions(
         filtered = filtered.unsplit_dates()
         filtered.df.insert(len(filtered.df.columns), 'transactions_filename', tdf.filename)
         filtered.df.insert(len(filtered.df.columns), 'query', query)        
-        export_path = f"{config.PATH_TO_TRANSACTIONS}/exported/{timestamp.strftime('%y%m%d_%H%M%S')}.csv"
+        export_path = f"{config.PATH_TO_EXPORTS}/{timestamp.strftime('%y%m%d_%H%M%S')}.csv"
         print(f"\nWriting filtered transactions to '{export_path}'...")
         filtered.df.to_csv(export_path, index=False)
         print('Done.')

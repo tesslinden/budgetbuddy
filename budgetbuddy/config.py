@@ -4,6 +4,7 @@ from typing import List, Dict
 from .classes.folder import Folder
 
 PATH_TO_BUDGET = '/Users/tesslinden/Dropbox/Misc/! Financial/transactions/budget.csv'
+PATH_TO_EXPORTS = '/Users/tesslinden/Dropbox/Misc/! Financial/transactions/exports'
 PATH_TO_PLOTS = '/Users/tesslinden/Dropbox/Misc/! Financial/transactions/plots'
 PATH_TO_TRANSACTIONS = '/Users/tesslinden/Dropbox/Misc/! Financial/transactions'
 
