@@ -272,16 +272,8 @@ def merge_all(write: bool = True) -> TransactionsDF:
     if len(deleted_transactions) > 0:
         print(f"\nThe following {len(deleted_transactions)} transactions were not found in manual.xlsx and will be deleted:")
         print(deleted_transactions.copy(cols=TransactionsDF.DISPLAY_COLUMNS_NAMES))
-        response = ''
-        while response not in ['y', 'n']:
-            response = input("Accept these deletions? y/n\t")
-            if response == 'y':
-                columns_to_drop = [col for col in annotated_pruned.columns if '_drop' in col or col=='_merge']
-                annotated.df = annotated_pruned.drop(deleted_transactions_index).drop(columns=columns_to_drop)
-                print(f"{len(deleted_transactions)} transaction(s) will be deleted.")
-            elif response == 'n':
-                deleted_transactions = TransactionsDF()
-                print("\nNo transactions will be deleted.")
+        columns_to_drop = [col for col in annotated_pruned.columns if '_drop' in col or col=='_merge']
+        annotated.df = annotated_pruned.drop(deleted_transactions_index).drop(columns=columns_to_drop)
     else:
         print("No deleted manual transactions were found.")
 
