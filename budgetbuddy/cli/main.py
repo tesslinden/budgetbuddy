@@ -22,6 +22,7 @@ def BudgetBuddyCLI(
     keyword: str = None,
     sort_by: List[str] = None,
     show_all_columns: bool = False,
+    #TODO: add option to sort by date_orig
     show_sum: bool = False,
     export: bool = False,
     replace: Dict[str,str] = None,

@@ -318,6 +318,8 @@ class TransactionsDF():
         rows_needing_annotation = get_rows_needing_annotation(self)
         if len(rows_needing_annotation) == 0:
             print(f"No rows need '{column.name}' annotations.")
+            if fill_nan_with_false: 
+                self.df[column.name] = self.df[column.name].fillna(False).astype(bool)
             return
         
         copy = self.copy()
@@ -493,7 +495,8 @@ class TransactionsDF():
         for k in kwargs.keys(): assert k in self.df.columns, f"Invalid column name: '{k}'"
 
         filtered_self = self.copy()
-        if len(queries) != 0: filtered_self.df = filtered_self.df.query(' and '.join(queries)) 
+        if len(queries) != 0: 
+            filtered_self.df = filtered_self.df.query(' and '.join(queries)) 
         if len(kwargs) != 0: 
             for k, v in kwargs.items():
                 filtered_self.df = filtered_self.df[filtered_self.df[k] == v]
