@@ -628,7 +628,7 @@ class TransactionsDF():
         self.filename = merged_filename
 
 
-    def sort_transactions(self):
+    def sort_transactions(self, use_date_orig_for_sorting: bool = False):
         """Sorts the data frame by the columns specified in the keys of TransactionsDF.SORTCOLUMNS_ASCENDINGBOOLS, 
         with the ascending/descending order specified in the values of TransactionsDF.SORTCOLUMNS_ASCENDINGBOOLS.
         """
@@ -638,6 +638,10 @@ class TransactionsDF():
             """Sorts a df by the column names and ascending booleans in TransactionsDF.SORTCOLUMNS_ASCENDINGBOOLS."""
 
             cols_ascendingbools = TransactionsDF.SORTCOLUMNS_ASCENDINGBOOLS.copy()
+            if use_date_orig_for_sorting:
+                cols_ascendingbools = {
+                    'date_orig' if k=='date' else k: v for k, v in cols_ascendingbools.items()
+                }
             cols_ascendingbools = {
                 k: v for k, v in cols_ascendingbools.items() if k in df.columns
             }
@@ -652,7 +656,8 @@ class TransactionsDF():
 
     def split_dates(self, inplace=False):
         """Adds three new columns to the TransactionsDF: 'year', 'month', and 'day', based
-        on the 'date' column. If inplace=True, the changes are made to self.df. If inplace=False,
+        on the 'date' column. Does the same for 'year_orig', 'month_orig', and 'day_orig'. 
+        If inplace=True, the changes are made to self.df. If inplace=False,
         a copy of self.df is returned with the changes.
         """
         if inplace: 
@@ -660,6 +665,9 @@ class TransactionsDF():
             self.df.insert(0, 'year', self.df['date'].dt.year)
             self.df.insert(1, 'month', self.df['date'].dt.month)
             self.df.insert(2, 'day', self.df['date'].dt.day)
+            self.df.insert(3, 'year_orig', self.df['date_orig'].dt.year)
+            self.df.insert(4, 'month_orig', self.df['date_orig'].dt.month)
+            self.df.insert(5, 'day_orig', self.df['date_orig'].dt.day)
         else: 
             copy = self.copy()
             copy.split_dates(inplace=True)
@@ -702,6 +710,7 @@ class TransactionsDF():
     
     def unsplit_dates(self, inplace=False):
         """Removes the columns 'year', 'month', and 'day' from the TransactionsDF, if they exist.
+        Does the same for 'year_orig', 'month_orig', and 'day_orig'.
         If inplace=True, the changes are made to self.df. 
         If inplace=False, a copy of self.df is returned with the changes.
         """
@@ -709,6 +718,9 @@ class TransactionsDF():
             if 'year' in self.df.columns: self.df = self.df.drop(columns=['year'])
             if 'month' in self.df.columns: self.df = self.df.drop(columns=['month'])
             if 'day' in self.df.columns: self.df = self.df.drop(columns=['day'])
+            if 'year_orig' in self.df.columns: self.df = self.df.drop(columns=['year_orig'])
+            if 'month_orig' in self.df.columns: self.df = self.df.drop(columns=['month_orig'])
+            if 'day_orig' in self.df.columns: self.df = self.df.drop(columns=['day_orig'])
         else: 
             copy = self.copy()
             copy.unsplit_dates(inplace=True)

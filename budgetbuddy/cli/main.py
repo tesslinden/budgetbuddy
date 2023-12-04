@@ -22,7 +22,7 @@ def BudgetBuddyCLI(
     keyword: str = None,
     sort_by: List[str] = None,
     show_all_columns: bool = False,
-    #TODO: add option to sort by date_orig
+    use_date_orig_for_sorting: bool = False,
     show_sum: bool = False,
     export: bool = False,
     replace: Dict[str,str] = None,
@@ -148,11 +148,13 @@ def BudgetBuddyCLI(
     
     if filter is not None:
         assert merged is not None, "merged is None."
+        merged.sort_transactions(use_date_orig_for_sorting=use_date_orig_for_sorting)
         display_filtered_transactions(
             merged,
             query=filter,
             display_columns=merged.df.columns if show_all_columns else None, 
             sort_by=sort_by,
+            use_date_orig_for_sorting=use_date_orig_for_sorting,
             show_sum=show_sum,
             export=export,
             timestamp=timestamp,
@@ -167,6 +169,7 @@ def display_filtered_transactions(
     query: str = None,
     display_columns: List[str] = None,
     sort_by: Dict[str,bool] = None,
+    use_date_orig_for_sorting: bool = False,
     show_sum: bool = False,
     export: bool = False,
     timestamp: datetime = datetime.today(),
@@ -180,7 +183,7 @@ def display_filtered_transactions(
     if display_columns is None: display_columns = TransactionsDF.DISPLAY_COLUMNS_NAMES.copy()
 
     filtered = tdf.split_dates()
-    filtered.sort_transactions()
+    filtered.sort_transactions(use_date_orig_for_sorting=use_date_orig_for_sorting)
 
     abs_amount_warning = False
     not_exclude_warning = False
