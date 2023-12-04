@@ -200,6 +200,8 @@ def display_filtered_transactions(
     if sort_by is not None:
         filtered.df = filtered.df.sort_values(by=list(sort_by.keys()),ascending=list(sort_by.values()))    
     
+    filtered.df = filtered.df.reset_index(drop=True)
+    
     print('')
     print(f"Results for query '{query}':")
     print('')
