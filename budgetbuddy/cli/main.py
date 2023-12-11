@@ -21,7 +21,7 @@ def BudgetBuddyCLI(
     filter: str = None, 
     keyword: str = None,
     sort_by: List[str] = None,
-    show_all_columns: bool = False,
+    show_all_columns: bool = None,
     use_date_orig_for_sorting: bool = False,
     show_sum: bool = False,
     export: bool = False,
@@ -55,8 +55,12 @@ def BudgetBuddyCLI(
     --sort_by: List[str] = None
         When used with --filter, sorts the displayed transactions by the specified columns.
 
-    --show_all_columns: bool = False
-        When used with --filter, displays all columns for the displayed transactions.
+    -u, --use_date_orig_for_sorting: bool = False
+        When used with --filter, sorts the displayed transactions by the date_orig column instead of the date column.
+
+    --show_all_columns: bool = None
+        When used with --filter, displays all columns for the displayed transactions. If --show_all_colums is None, its 
+        value is set to the value of --use_date_orig_for_sorting.
 
     --show_sum: bool = False
         When used with --filter, displays the sum of the amounts of the displayed transactions.
@@ -149,6 +153,7 @@ def BudgetBuddyCLI(
     if filter is not None:
         assert merged is not None, "merged is None."
         merged.sort_transactions(use_date_orig_for_sorting=use_date_orig_for_sorting)
+        if show_all_columns is None: show_all_columns = use_date_orig_for_sorting
         display_filtered_transactions(
             merged,
             query=filter,
