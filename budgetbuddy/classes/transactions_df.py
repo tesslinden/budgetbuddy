@@ -28,6 +28,7 @@ class TransactionsDF():
         Column(name='year', base=False, display=False, dtype=int),
         Column(name='month', base=False, display=False, dtype=int),
         Column(name='day', base=False, display=False, dtype=int),
+        Column(name='yrmo', base=False, display=False, dtype=str),
         Column(name='transaction', base=True, display=True, dtype=str),
         Column(name='amount', base=True, display=True, dtype=float),
         Column(name='category', base=False, display=True, dtype=str),
@@ -655,19 +656,21 @@ class TransactionsDF():
 
 
     def split_dates(self, inplace=False):
-        """Adds three new columns to the TransactionsDF: 'year', 'month', and 'day', based
-        on the 'date' column. Does the same for 'year_orig', 'month_orig', and 'day_orig'. 
-        If inplace=True, the changes are made to self.df. If inplace=False,
-        a copy of self.df is returned with the changes.
+        """Adds four new columns to the TransactionsDF: 'year', 'month', 'day', and 
+        'yrmo' (year-month), based on the 'date' column. Does the same for 'year_orig', 
+        'month_orig', 'day_orig', and 'yrmo_orig'. If inplace=True, the changes are 
+        made to self.df. If inplace=False, a copy of self.df is returned with the changes.
         """
         if inplace: 
             self.unsplit_dates(inplace=True)
             self.df.insert(0, 'year', self.df['date'].dt.year)
             self.df.insert(1, 'month', self.df['date'].dt.month)
             self.df.insert(2, 'day', self.df['date'].dt.day)
-            self.df.insert(3, 'year_orig', self.df['date_orig'].dt.year)
-            self.df.insert(4, 'month_orig', self.df['date_orig'].dt.month)
-            self.df.insert(5, 'day_orig', self.df['date_orig'].dt.day)
+            self.df.insert(3, 'yrmo', self.df['date'].dt.strftime('%Y-%m'))
+            self.df.insert(4, 'year_orig', self.df['date_orig'].dt.year)
+            self.df.insert(5, 'month_orig', self.df['date_orig'].dt.month)
+            self.df.insert(6, 'day_orig', self.df['date_orig'].dt.day)
+            self.df.insert(7, 'yrmo_orig', self.df['date_orig'].dt.strftime('%Y-%m'))
         else: 
             copy = self.copy()
             copy.split_dates(inplace=True)
@@ -715,12 +718,9 @@ class TransactionsDF():
         If inplace=False, a copy of self.df is returned with the changes.
         """
         if inplace: 
-            if 'year' in self.df.columns: self.df = self.df.drop(columns=['year'])
-            if 'month' in self.df.columns: self.df = self.df.drop(columns=['month'])
-            if 'day' in self.df.columns: self.df = self.df.drop(columns=['day'])
-            if 'year_orig' in self.df.columns: self.df = self.df.drop(columns=['year_orig'])
-            if 'month_orig' in self.df.columns: self.df = self.df.drop(columns=['month_orig'])
-            if 'day_orig' in self.df.columns: self.df = self.df.drop(columns=['day_orig'])
+            columns_to_drop = ['year','month','day','yrmo','year_orig','month_orig','day_orig','yrmo_orig']
+            columns_to_drop = [col for col in columns_to_drop if col in self.df.columns]
+            self.df = self.df.drop(columns=columns_to_drop)
         else: 
             copy = self.copy()
             copy.unsplit_dates(inplace=True)

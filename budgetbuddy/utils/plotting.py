@@ -97,6 +97,11 @@ def plot_all(
     if palette is None:
         colors = sns.color_palette('tab10',10)+[sns.color_palette('Set2',10)[5]]+[sns.color_palette('tab20',20)[9]]
         palette = dict(zip(np.arange(1,13), colors))
+        yrmo_list = list(tdf.df['yrmo'].sort_values().unique())
+        month_to_yrmo = dict(zip([int(yrmo[-2:]) for yrmo in yrmo_list], yrmo_list))
+        assert len(month_to_yrmo.keys()) == len(set(month_to_yrmo.keys())), "month_to_yrmo dict has duplicate keys"
+        palette = {month_to_yrmo[mo]: palette[mo] for mo in palette.keys() if mo in month_to_yrmo.keys()}
+        
 
     plt.rcParams['figure.constrained_layout.use'] = True
     fig = plt.figure(figsize=figsize, layout='constrained')
@@ -237,23 +242,22 @@ def plot_categories_bars(
         transactions_df = transactions_df.loc[transactions_df['category']=='income'].copy()
         transactions_df = transactions_df.drop(columns=['category']).rename(columns={'subcategory':'category'})
 
-    monthly_sums = transactions_df[['year','month','category','amount']
-        ].groupby(['year', 'month', 'category']).sum().reset_index()
+    monthly_sums = transactions_df[['yrmo','category','amount']
+        ].groupby(['yrmo', 'category']).sum().reset_index()
     rows_to_add = []
     for category in monthly_sums['category'].unique():
-        for month in monthly_sums['month'].unique():
-            if category not in monthly_sums.loc[monthly_sums['month']==month, 'category'].values:
+        for yrmo in monthly_sums['yrmo'].unique():
+            if category not in monthly_sums.loc[monthly_sums['yrmo']==yrmo, 'category'].values:
                 rows_to_add.append({
-                    'year': 2023,
-                    'month': month,
+                    'yrmo': yrmo,
                     'category': category,
                     'amount': 0,
                 })
     monthly_sums = pd.concat([monthly_sums, pd.DataFrame(rows_to_add)], ignore_index=True)
     monthly_sums['abs_amount'] = [abs(x) for x in monthly_sums['amount']]
     monthly_sums = monthly_sums.sort_values(
-        by=['year','month','abs_amount'],
-        ascending=[False,False,False]
+        by=['yrmo','abs_amount'],
+        ascending=[False,False]
     ).reset_index(drop=True)
     monthly_sums = monthly_sums.drop(columns=['abs_amount'])
 
@@ -269,7 +273,7 @@ def plot_categories_bars(
 
     plot_df['category'] = [category.capitalize() for category in plot_df['category']]
     category_order = plot_df.loc[
-        plot_df['month'] < datetime.today().month,
+        plot_df['yrmo'] < misc.get_yrmo(datetime.today()),
         ['category','amount']
         ].groupby(['category']).sum().sort_values('amount', ascending=False).index
     plot_df['category'] = pd.Categorical(
@@ -277,19 +281,27 @@ def plot_categories_bars(
         categories=category_order, 
         ordered=True
     )
-    plot_df.sort_values(by=['category','year','month'], inplace=True)
+    plot_df.sort_values(by=['category','yrmo'], inplace=True)
 
     ax = plt.subplot2grid(shape=shape, loc=loc, colspan=colspan, rowspan=rowspan)
     sns.barplot(
         data=plot_df,
         ax=ax,
-        hue='month',
+        hue='yrmo',
         y='amount',
         x='category',
         edgecolor='black',
         palette=palette,
     )
-    ax.legend(loc='upper right', title='Month', edgecolor='black')    
+
+    handles, labels = ax.get_legend_handles_labels()
+    ax.legend(
+        handles, 
+        [misc.as_concise_yrmo(label) for label in labels], 
+        loc='upper right', 
+        edgecolor='black',
+        title='Month',
+    )
             
     ax.get_yaxis().set_major_formatter(
         matplotlib.ticker.FuncFormatter(lambda y, p: as_money_string(y, thousands_as_k=False))
@@ -356,7 +368,7 @@ def plot_spending_lines(
     days_in_current_month = calendar.monthrange(datetime.now().year, datetime.now().month)[1]
     daily_target = (spending_target-(yint or 0))/(days_in_current_month)
 
-    daily_spending = transactions_df[['year','month','day','amount']].groupby(['year', 'month', 'day']).sum().reset_index()
+    daily_spending = transactions_df[['yrmo','day','amount']].groupby(['yrmo', 'day']).sum().reset_index()
     daily_spending['amount'] = -1*daily_spending['amount']
     date_range = pd.date_range(
         start=transactions_df['date'].min(), 
@@ -364,23 +376,22 @@ def plot_spending_lines(
         freq='D'
     )
     all_days = pd.DataFrame({
-        'year':date_range.year,
-        'month':date_range.month,
+        'yrmo': [misc.get_yrmo(dt) for dt in date_range],
         'day':date_range.day,
     })
-    daily_spending = pd.merge(left=all_days, right=daily_spending, how='left', on=['year','month','day'])
+    daily_spending = pd.merge(left=all_days, right=daily_spending, how='left', on=['yrmo','day'])
     daily_spending['amount'] = daily_spending['amount'].fillna(0)
 
-    month_dfs = [daily_spending[daily_spending['month']==month] for month in daily_spending['month'].unique()]
-    for month_df in month_dfs:
-        month_df.insert(len(month_df.columns)-1, 'cumulative', month_df['amount'].cumsum())
-    daily_spending['cumulative'] = pd.concat(month_dfs)['cumulative'].values    
+    yrmo_dfs = [daily_spending[daily_spending['yrmo']==yrmo] for yrmo in daily_spending['yrmo'].unique()]
+    for yrmo_df in yrmo_dfs:
+        yrmo_df.insert(len(yrmo_df.columns)-1, 'cumulative', yrmo_df['amount'].cumsum())
+    daily_spending['cumulative'] = pd.concat(yrmo_dfs)['cumulative'].values    
     
     ax = plt.subplot2grid(shape=shape, loc=loc, rowspan=rowspan, colspan=colspan)
     sns.lineplot(
         data=daily_spending,
         ax=ax,
-        hue='month',
+        hue='yrmo',
         y='cumulative',
         x='day',
         palette=palette,
@@ -398,7 +409,7 @@ def plot_spending_lines(
     ax.plot(target_x, target_y, color='gray', linestyle='--', linewidth=1)
 
     if show_current:
-        daily_spending_current_month = daily_spending[daily_spending['month']==timestamp.month]
+        daily_spending_current_month = daily_spending[daily_spending['yrmo']==misc.get_yrmo(timestamp)]
         cumulative_spending_today = daily_spending_current_month['cumulative'].iloc[-1]
         today = timestamp.day
         amount_remaining = spending_target - cumulative_spending_today
@@ -458,7 +469,14 @@ def plot_spending_lines(
     )
     for label in ax.get_xticklabels(): label.set_fontsize(kwargs['xtick_label_fontsize'])
     for label in ax.get_yticklabels(): label.set_fontsize(kwargs['ytick_label_fontsize'])
-    ax.legend(loc='upper left', title='Month', edgecolor='black') 
+    handles, labels = ax.get_legend_handles_labels()
+    ax.legend(
+        handles, 
+        [misc.as_concise_yrmo(label) for label in labels], 
+        loc='upper left', 
+        edgecolor='black',
+        title='Month',
+    )
     ax.set_ylabel(None)
     ax.set_xlabel('Day of month\n', fontsize=kwargs['axis_label_fontsize'])  
     if title: ax.set_title(title, fontsize=kwargs['subplot_title_fontsize'])
@@ -514,33 +532,29 @@ def plot_totals_bars(
         elif transaction_type == 'spending':
             transactions_df = transactions_df.drop(columns=['category'])
             transactions_df['category'] = ['Budgeted' if budgeted else 'Discretionary' for budgeted in transactions_df['budgeted']]
-        plot_df = transactions_df[['year','month','category','amount']].groupby(['year', 'month', 'category']).sum().reset_index()
-        plot_df_summed = plot_df[['year','month','amount']].groupby(['year', 'month']).sum().reset_index()
+        plot_df = transactions_df[['yrmo','category','amount']].groupby(['yrmo', 'category']).sum().reset_index()
+        plot_df_summed = plot_df[['yrmo','amount']].groupby(['yrmo']).sum().reset_index()
     else:
-        plot_df = transactions_df[['year','month','amount']].groupby(['year', 'month']).sum().reset_index()
+        plot_df = transactions_df[['yrmo','amount']].groupby(['yrmo']).sum().reset_index()
 
     #TODO: figure out why some march merged files fail around here. maybe it is when salary < 0 ?
     # if any(plot_df['amount'] < 0):
     #     raise ValueError("plot_totals_bars() is not yet supported when negative values are present in plot_df")
 
     ax = plt.subplot2grid(shape=shape, loc=loc, colspan=colspan, rowspan=rowspan)
-    xs = np.arange(1,len(plot_df['month'].unique())+1)
+    xs = np.arange(1,len(plot_df['yrmo'].unique())+1)
 
     if stacked:
         date_range = pd.date_range(start=transactions_df['date'].min(), end=transactions_df['date'].max(), freq='D')
         all_months = pd.concat([pd.DataFrame({
-            'year':date_range.year, 
-            'month':date_range.month, 
+            'yrmo': [misc.get_yrmo(dt) for dt in date_range],
             'category': category
         }) for category in plot_df['category'].unique()])
         all_months = all_months.drop_duplicates().reset_index(drop=True)
-        plot_df = pd.merge(left=all_months, right=plot_df, how='left', on=['year','month','category']).fillna(0)
-        assert plot_df['year'].nunique() <= 1, (
-            f"plot_df:\n{plot_df}\n"+
-            "plot_totals_bars(stacked=True) is not yet supported when transactions from multiple years are present. See plot_df above."
-        )
-
-        categories_amounts = {category: plot_df.loc[plot_df['category']==category, 'amount'] for category in plot_df['category'].unique()}
+        plot_df = pd.merge(left=all_months, right=plot_df, how='left', on=['yrmo','category']).fillna(0)
+        categories_amounts = {
+            category: plot_df.loc[plot_df['category']==category, 'amount'] for category in plot_df['category'].unique()
+        }
         categories_amounts = {k: categories_amounts[k] for k in list(categories_amounts.keys())[::-1]}
         bottom = np.zeros(len(plot_df.loc[plot_df['category']==plot_df.loc[0,'category']]))
         color = make_rgb_darker(matplotlib.colors.to_rgb(color), 0.15)
@@ -570,9 +584,9 @@ def plot_totals_bars(
             color=color,
         )
 
-    if stacked: previous_months_df = plot_df_summed.loc[plot_df_summed['month'] < timestamp.month]
-    else: previous_months_df = plot_df.loc[plot_df['month'] < timestamp.month]
-    if show_average: previous_months_average = previous_months_df['amount'].mean()
+    if stacked: previous_yrmos_df = plot_df_summed.loc[plot_df_summed['yrmo'] < misc.get_yrmo(timestamp)]
+    else: previous_yrmos_df = plot_df.loc[plot_df['yrmo'] < misc.get_yrmo(timestamp)]
+    if show_average: previous_months_average = previous_yrmos_df['amount'].mean()
 
     #TODO: for spending & income, the references to plot_df['amount'].min() or .max() should be changed 
     # from the min/max of any subcategory to the min/max of the two subcategories together 
@@ -695,8 +709,9 @@ def plot_totals_bars(
         avg_text = ax.text(
             x=ax.get_xlim()[1]+0.05, 
             y=ax.get_ylim()[0] if average_below_ymin else previous_months_average,
-            s=f"Avg ({previous_months_df['month'].min()}-{previous_months_df['month'].max()}):\n" + 
-            f"{as_money_string(previous_months_average)}", 
+            s=f"Avg ({misc.as_concise_yrmo(previous_yrmos_df['yrmo'].min())}-" +
+                f"{misc.as_concise_yrmo(previous_yrmos_df['yrmo'].max())}):\n" + 
+                f"{as_money_string(previous_months_average)}", 
             fontsize=kwargs['line_label_fontsize'], 
             color=average_color,
             va=average_va,
@@ -705,8 +720,8 @@ def plot_totals_bars(
         avg_text.set_in_layout(False)
 
     ax.set_xticks(xs)
-    months = plot_df.loc[plot_df['category']==plot_df['category'].unique()[0],'month'] if stacked else plot_df['month']
-    ax.set_xticklabels(months) 
+    yrmos = plot_df.loc[plot_df['category']==plot_df['category'].unique()[0],'yrmo'] if stacked else plot_df['yrmo']
+    ax.set_xticklabels([misc.as_concise_yrmo(yrmo) for yrmo in yrmos]) 
     ax.get_yaxis().set_major_formatter(
         matplotlib.ticker.FuncFormatter(lambda y, p: as_money_string(y, thousands_as_k=False))
     )
