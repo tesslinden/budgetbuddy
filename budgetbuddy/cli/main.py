@@ -141,7 +141,7 @@ def BudgetBuddyCLI(
         first_date_shown = last_date_shown - pd.DateOffset(months=number_of_previous_months_shown)
         first_date_shown = first_date_shown.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         plot_tdf = merged.split_dates().filter("not exclude").filter(
-            f"date >= '{first_date_shown}' and month <= {last_date_shown.month} and year <= {last_date_shown.year}"
+            f"date >= '{first_date_shown}' and yrmo <= '{misc.get_yrmo(last_date_shown)}'"
         )
         plotting.plot_all(
             plot_tdf,
