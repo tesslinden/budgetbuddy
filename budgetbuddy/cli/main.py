@@ -214,7 +214,8 @@ def display_filtered_transactions(
     
     if show_sum:
         print('')
-        print(f"Sum: {filtered.copy(cols=['amount']).df.sum()[0]}")
+        sum = filtered.copy(cols=['amount']).df.sum()[0]
+        print(f"Sum: {plotting.as_money_string(sum, include_cents=True)}")
 
     if export:
         filtered = filtered.unsplit_dates()
