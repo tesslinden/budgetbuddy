@@ -1,16 +1,16 @@
 import os
+import re
 from datetime import datetime
 from typing import Dict, List
 
 import fire
 import pandas as pd
-import re
 
 from .. import config
-from ..utils import importing, misc, plotting
 from ..classes.column import Column
 from ..classes.folder import Folder
 from ..classes.transactions_df import TransactionsDF
+from ..utils import importing, misc, plotting
 
 
 def BudgetBuddyCLI(
