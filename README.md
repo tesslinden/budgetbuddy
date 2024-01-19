@@ -56,7 +56,7 @@ By default (if you run `budgetbuddy` with no arguments), BudgetBuddy will do the
 2. Import the manual transactions file and check if any new transactions are present or if any transactions have been deleted
 3. Import the raw transactions files and look for any new transactions not found in the merged file; if there are new transactions, ask the user to annotate them
 4. Make a new merged file with the deletions and additions identified in steps 2 & 3; save it in the merged transactions folder
-5. Import the budget file; use the budget file and the new merged file from step 4 to plot spending and income patterns for the last 6 months; save the plots in the plots folder 
+5. Import the budget file; use the budget file and the new merged file from step 4 to plot spending and income patterns for the past 6 months; save the plot in the plots folder 
 
 Here is an example output made with mock data: 
 ![Example output made with mock data](example_output_using_mock_data.png)
