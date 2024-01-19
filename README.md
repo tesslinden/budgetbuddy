@@ -86,3 +86,5 @@ TODO: more on configuration
 * Refactor plotting.py and importing.py which are currently a little bit monstrous
 * Add feature: ability to edit merged transaction files via command line
 * Add feature: ability to annotate a transaction with a note
+* Double check which dependencies are required; automatically install dependencies 
+* Add installation option
