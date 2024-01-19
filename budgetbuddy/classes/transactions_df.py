@@ -568,7 +568,6 @@ class TransactionsDF():
         If there are duplicates, and 'get_input' is True, prints a list of the duplicates and asks the user
         whether to drop them.
         """
-        #TODO: check for Venmo duplicates on different days, like David's Airbnb payment.
         print("\nChecking for internal duplicates...") 
         view_cols = subset
         if 'category' in self.df.columns: view_cols = ['category'] + view_cols
