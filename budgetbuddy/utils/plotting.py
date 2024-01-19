@@ -45,11 +45,8 @@ def make_rgb_lighter(rgb: Tuple[float,float,float], d: float) -> Tuple[float]:
 def plot_all(
     tdf: TransactionsDF,
     budget_df: pd.DataFrame,
-    salary_target: float = 1000,
-    savings_target: float = -4.1, #TODO: make it so that savings_target can be specified as percent or dollar amount
-    # unemployed spending target = -$5100 = ~$60/day discretionary spending + $3234 budgeted spending
-    # unemployed income target = +$1000 
-    # unemployed savings target = -$4100 + $1000
+    salary_target: float = config.SALARY_TARGET,
+    savings_target: float = config.SAVINGS_TARGET,
     show_negative_savings: bool = True,
     figsize: Tuple[float,float] = (18, 10), # width, height
     subplot_title_fontsize: float = 15,
