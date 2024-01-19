@@ -132,7 +132,7 @@ def get_matching_row_of_budget(
     amount: float,
 ):
     #TODO: reformat to use string_to_list_of_strings. 
-    #TODO: maybe make this more efficient by using something other than for loops
+    #TODO: make this more efficient by using something other than for loops (df.merge perhaps)
     name_test_cols = ['name_test'+x for x in [str(i) for i in range(1,100)]]
     name_test_cols = [col for col in name_test_cols if col in budget.columns]
     amount_test_cols = ['amount_test'+x for x in [str(i) for i in range(1,100)]]
@@ -252,7 +252,7 @@ def merge_all(write: bool = True) -> TransactionsDF:
     annotated.sort_transactions()
     print(f"Imported {annotated.filename}.")
 
-    # 0.5. if there are transactions in merged that have been deleted from manual.xlsx, delete them from annotated df
+    # 1. if there are transactions in merged that have been deleted from manual.xlsx, delete them from annotated df
     print("\nChecking for deleted manual transactions...")
     manual = FromExcelTransactionsDF(folder=config.FOLDERS_DICT['manual'])
     assert_compatible_dates(manual)
@@ -277,7 +277,7 @@ def merge_all(write: bool = True) -> TransactionsDF:
     else:
         print("No deleted manual transactions were found.")
 
-    # 1. import ALL raw files: relay, avis, asav, manual; prune transactions that are already in annotated df
+    # 2. import ALL raw files: relay, avis, asav, manual; prune transactions that are already in annotated df
     print("\nImporting unannotated transactions files & pruning them against the annotated transactions...")
     unannotated, unannotated_filenames = concat_all_unannotated(prune_tdf=annotated if len(annotated) > 0 else None)
     unannotated.sort_transactions()
@@ -293,10 +293,10 @@ def merge_all(write: bool = True) -> TransactionsDF:
         print("\nNew transactions:")
         print(unannotated.copy(cols=TransactionsDF.DISPLAY_COLUMNS_NAMES).category_to_bottom('transfers'))
 
-    # 2. prune internal duplicates
+    # 3. prune internal duplicates
     unannotated.prune_internal_duplicates()
 
-    # 3. add category, exclude, date_override, budgeted, and subcategory annotation columns
+    # 4. add category, exclude, date_override, budgeted, and subcategory annotation columns
     unannotated.annotate_all()
     unannotated.sort_transactions()
     
@@ -316,7 +316,7 @@ def merge_all(write: bool = True) -> TransactionsDF:
             if confirm == 'n': return annotated
             else: response = ''
 
-    #4. concat annotated & newly annotated
+    # 5. concat annotated & newly annotated
     if sorted(list(annotated.df.columns)) != sorted(list(unannotated.df.columns)):
         print("WARNING: annotated and newly_annotated tdfs have different columns: "+(
             f"{annotated.df.columns=} vs. {unannotated.df.columns=}"))
