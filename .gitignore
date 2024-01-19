@@ -177,3 +177,6 @@ pyrightconfig.json
 
 # macOS
 .DS_Store
+
+# Custom config file
+budgetbuddy/config.py
