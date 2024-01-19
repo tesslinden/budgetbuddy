@@ -1,5 +1,5 @@
 try:
-    from .. import config
+    from . import config
 except ImportError:
     raise ImportError(
         "config.py not found. Please ensure config.py exists in the budgetbuddy directory. \
