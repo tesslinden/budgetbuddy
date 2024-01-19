@@ -20,28 +20,7 @@ BudgetBuddy currently has some sections that are messy due to accumulated patche
 
 ## Requirements
 
-- **Python Version**: 3.11.3
-- **Dependencies**:
-  - brewer2mpl==1.4.1
-  - contourpy==1.1.1
-  - cycler==0.12.1
-  - et-xmlfile==1.1.0
-  - fire==0.5.0
-  - fonttools==4.43.1
-  - kiwisolver==1.4.5
-  - matplotlib==3.8.0
-  - numpy==1.26.0
-  - openpyxl==3.1.2
-  - packaging==23.2
-  - pandas==2.1.1
-  - Pillow==10.0.1
-  - pyparsing==3.1.1
-  - python-dateutil==2.8.2
-  - pytz==2023.3.post1
-  - seaborn==0.13.0
-  - six==1.16.0
-  - termcolor==2.3.0
-  - tzdata==2023.3
+- **Python Version**: 3.11 or higher
 
 
 ## Installation
