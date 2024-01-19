@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Dict
+from typing import Dict, Optional
 
 from .. import config
 
@@ -9,14 +9,14 @@ class Folder:
     name: str
     prefix: str
     suffix: str
-    final_column_index: int = None
-    columns_to_rename: Dict[str,str] = None
-    account: str = None
+    final_column_index: Optional[int] = None
+    columns_to_rename: Optional[Dict[str,str]] = None
+    account: Optional[str] = None
     reformat_amounts_alliant: bool = False 
     flip_sign_of_amounts: bool = False
     prune_columns: bool = False
     fill_false: bool = False
-    filename_format: str = None
+    filename_format: Optional[str] = None
 
     @property
     def path(self):

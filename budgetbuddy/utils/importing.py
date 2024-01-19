@@ -1,5 +1,5 @@
 import os
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import pandas as pd
 import re
@@ -23,10 +23,10 @@ def FromExcelTransactionsDF(**kwargs) -> TransactionsDF:
 def FromSpreadsheetTransactionsDF(
     filetype: str,
     folder: Folder, 
-    filename: str = None, 
-    prefix: str = None,
-    prune_columns: bool = None,
-    fill_false: bool = None,
+    filename: Optional[str] = None, 
+    prefix: Optional[str] = None,
+    prune_columns: Optional[bool] = None,
+    fill_false: Optional[bool] = None,
 ) -> TransactionsDF:
     """Imports a csv file as a TransactionsDF.
     If filename is None, the max filename with the given prefix and the suffix '.csv'
@@ -76,8 +76,8 @@ def FromSpreadsheetTransactionsDF(
 
 def FromTxtTransactionsDF(
     folder: Folder, 
-    filename: str = None, 
-    prefix: str = None,
+    filename: Optional[str] = None, 
+    prefix: Optional[str] = None,
 ) -> TransactionsDF:
     """Imports a relay txt file as a TransactionsDF.
     If filename is None, the max filename with the prefix 'relay' and the suffix '.txt'
@@ -152,8 +152,8 @@ def get_matching_row_of_budget(
 
 def get_max_filename(
     folder: Folder, 
-    prefix: str = None, 
-    suffix: str = None
+    prefix: Optional[str] = None, 
+    suffix: Optional[str] = None
 ) -> str:
     """Returns the max filename with a given prefix & suffix from a given folder within path_to_transactions."""
 
@@ -193,7 +193,7 @@ def get_max_filename(
 
 
 def concat_all_unannotated(
-    prune_tdf: TransactionsDF = None,
+    prune_tdf: Optional[TransactionsDF] = None,
 ) -> Tuple[TransactionsDF, List[str]]: 
     """Imports all unannotated transactions from all folders in folders.keys() (except 'merged') and 
     concatenates them into a single TransactionsDF.

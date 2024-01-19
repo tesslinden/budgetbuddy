@@ -1,6 +1,6 @@
 import calendar
 from datetime import datetime
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -63,7 +63,7 @@ def plot_all(
     show: str = False,
     timestamp: datetime = datetime.today(),
     date_line: datetime = datetime.today(),
-    palette: Union[str,Dict[int,Tuple[float,float,float]]] = None,
+    palette: Optional[Union[str,Dict[int,Tuple[float,float,float]]]] = None,
 ) -> None:
     """Creates a plot made of multiple subplots (listed below). If write=True, the plot is saved to a file. 
     If show=True, the plot is displayed. 
@@ -223,8 +223,8 @@ def plot_categories_bars(
     loc: Tuple[int,int],
     rowspan: int,
     colspan: int,
-    title: str = None,
-    palette: Union[str,List[Tuple[float,float,float]]] = None,
+    title: Optional[str] = None,
+    palette: Optional[Union[str,List[Tuple[float,float,float]]]] = None,
     **kwargs
 ) -> None:
     """Plots a barplot of monthly spending by category. Bars are colored by month.
@@ -348,10 +348,10 @@ def plot_spending_lines(
     colspan: int,
     show_current: bool = True,
     show_today: bool = True,
-    yint: float = None, # TODO: use this to set y intercept
-    title: str = None,
+    yint: Optional[float] = None, # TODO: use this to set y intercept
+    title: Optional[str] = None,
     timestamp: datetime = datetime.today(),
-    palette: Union[str,List[Tuple[float,float,float]]] = None,
+    palette: Optional[Union[str,List[Tuple[float,float,float]]]] = None,
     **kwargs
 ) -> None:
     """Plots a lineplot of the cumulative spending trajectory over time each month. The plot is annotated with a 
@@ -490,11 +490,11 @@ def plot_totals_bars(
     color: str,
     show_negative_savings: bool = True,
     show_target: bool = True,
-    savings_target: float = None,
-    salary_target: float = None,
+    savings_target: Optional[float] = None,
+    salary_target: Optional[float] = None,
     show_average: bool = True,
     stacked: bool = False,
-    title: str = None,
+    title: Optional[str] = None,
     timestamp: datetime = datetime.today(),
     **kwargs
 ) -> None:

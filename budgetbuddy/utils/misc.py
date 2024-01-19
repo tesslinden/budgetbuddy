@@ -1,9 +1,10 @@
 import inspect
 from datetime import datetime
+from typing import Any, Callable, Dict, Optional
 
 import re
 
-def get_arguments(function, locals): # not sure what types to put for these arguments
+def get_arguments(function: Callable, locals: Dict[str, Any]) -> Dict[str, Any]:
     """Returns a dictionary of the argument names and their current values for a given function.
     Always pass locals() as the second argument to get_arguments().
     """
@@ -13,12 +14,12 @@ def get_arguments(function, locals): # not sure what types to put for these argu
     arguments = dict(zip(argument_names, argument_values))
     return arguments
 
-def get_yrmo(dt: datetime):
+def get_yrmo(dt: datetime) -> str:
     """Takes a datetime object and returns a string in the format "YYYY-MM".
     """
     return dt.strftime('%Y-%m')
 
-def as_concise_yrmo(yrmo: str):
+def as_concise_yrmo(yrmo: str) -> str:
     """Takes a yrmo string (a datetime string in the format "YYYY-MM") and returns a string in the format "M/YY".
     """
     assert re.match(r'\d{4}-\d{2}', yrmo), "yrmo must be in format YYYY-MM"

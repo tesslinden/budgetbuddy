@@ -1,7 +1,7 @@
 import os
 import re
 from datetime import datetime
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import fire
 import pandas as pd
@@ -14,18 +14,18 @@ from ..utils import importing, misc, plotting
 
 
 def BudgetBuddyCLI(
-    merge: bool = None, 
-    i: str = None,
-    plot: bool = None, 
-    date_line: str = None,
-    filter: str = None, 
-    keyword: str = None,
-    sort_by: List[str] = None,
-    show_all_columns: bool = None,
+    merge: Optional[bool] = None, 
+    i: Optional[str] = None,
+    plot: Optional[bool] = None, 
+    date_line: Optional[str] = None,
+    filter: Optional[str] = None, 
+    keyword: Optional[str] = None,
+    sort_by: Optional[List[str]] = None,
+    show_all_columns: Optional[bool] = None,
     use_date_orig_for_sorting: bool = False,
     show_sum: bool = False,
     export: bool = False,
-    replace: Dict[str,str] = None,
+    replace: Optional[Dict[str,str]] = None,
 ):
     """
     BudgetBuddyCLI is a command line interface for the BudgetBuddy package. 
@@ -171,9 +171,9 @@ def BudgetBuddyCLI(
 
 def display_filtered_transactions(
     tdf: TransactionsDF,
-    query: str = None,
-    display_columns: List[str] = None,
-    sort_by: Dict[str,bool] = None,
+    query: Optional[str] = None,
+    display_columns: Optional[List[str]] = None,
+    sort_by: Optional[Dict[str,bool]] = None,
     use_date_orig_for_sorting: bool = False,
     show_sum: bool = False,
     export: bool = False,
@@ -233,8 +233,8 @@ def display_filtered_transactions(
 
 
 def find_replace(
-    find: str = None,
-    replace: str = None,
+    find: str,
+    replace: str,
 ):
     """Finds and replaces all instances of the specified strings in all non-xlsx files with the expected prefixes in
     the folders specified in config.FOLDERS_LIST. 
