@@ -73,11 +73,9 @@ For more details, run `budgetbuddy --help`.
 
 Before you can use `budgetbuddy`, you need to create a `config.py` file with your own settings. You can do this by copying the `config.py.example` file and renaming it to `config.py`.
 
-```bash
-cp budgetbuddy/config.py.example budgetbuddy/config.py
+In "config.py", specify the paths to the relevant folders using the PATH_TO_[folder] variables.
 
-In "config.py", specify the paths to the relevant folders using the PATH_TO_* variables.
-[TODO: more here]
+TODO: more on configuration
 
 ## To Do
 
