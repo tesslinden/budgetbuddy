@@ -1,5 +1,5 @@
 import os
-from typing import List, Dict
+from typing import Dict, List, Optional
 
 import numpy as np
 import pandas as pd
@@ -89,8 +89,8 @@ class TransactionsDF():
 
     def __init__(
         self, 
-        folder: Folder = None, 
-        filename: str = None, 
+        folder: Optional[Folder] = None, 
+        filename: Optional[str] = None, 
         prune_columns: bool = False, 
         fill_false: bool = False,
         *args, 
@@ -253,18 +253,19 @@ class TransactionsDF():
                 annotate_rows_that_are_excluded = True,
                 annotate_rows_that_are_from_manual = False,
                 columns_to_display = None,
-                exclude_rows = [row for row in self.df.index if self.df.loc[row, 'category'] != category],
+                rows_to_annotate = self.df['category'] == category,
             )
 
 
     def annotate_column(
         self,
         column: Column,
-        starting_statement: str = None,
-        skip_question: str = "None of the above transactions will be excluded. OK? y/n: ",
+        rows_to_annotate: Optional[pd.Series] = None,
+        starting_statement: Optional[str] = None,
+        skip_question: str = "None of the above transactions will be excluded. OK? y/n: ", #TODO: make this not hardcoded
         annotate_automatically_with_budget: bool = False,
         annotate_automatically_with_dict: bool = False,
-        annotation_dict: Dict = None,
+        annotation_dict: Optional[Dict] = None,
         annotate_question: str = "Exclude this transaction? y/n (r=restart): ",
         response_format: str = r"^[yn]$",
         store_yn_as_TF: bool = True,
@@ -273,8 +274,7 @@ class TransactionsDF():
         annotate_rows_that_are_transfers: bool = False,
         annotate_rows_that_are_excluded: bool = True,
         annotate_rows_that_are_from_manual: bool = False,
-        exclude_rows: List = None,
-        columns_to_display: bool = None,
+        columns_to_display: Optional[bool] = None,
     ):
         """TODO: Write docstring"""
 
@@ -285,20 +285,35 @@ class TransactionsDF():
             arguments = misc.get_arguments(TransactionsDF.annotate_column, locals)
             self.annotate_column(**{k:v for k,v in arguments.items() if k!='self'})
 
-        def get_rows_needing_annotation(tdf: TransactionsDF):
+        def get_rows_needing_annotation(
+            tdf: TransactionsDF, 
+            rows_to_annotate: Optional[pd.Series] = rows_to_annotate,
+        ):
+            """Returns a list of the indices of the rows that need to be annotated for a given column.
+            Rows that needed to be annotated are ones that satisfy the following conditions:
+            - the value in the `column` column is na
+            - the value in the 'category' column is not 'transfers' (unless annotate_rows_that_are_transfers is True)
+            - the value in the 'exclude' column is False (unless annotate_rows_that_are_excluded is True)
+            - the value in the 'filename' column is not 'manual.xlsx' (unless annotate_rows_that_are_from_manual is True)
+            """
+            column_to_annotate_is_na = tdf.df[column.name].isna()
+
+            category_is_not_transfer = True if not 'category' in tdf.df.columns else (tdf.df['category'] != 'transfers')
+
+            exclude_is_false = True if not 'exclude' in tdf.df.columns else (tdf.df['exclude'] == False)
+
+            filename_is_not_manual = True if not 'filename' in tdf.df.columns else (tdf.df['filename'] != 'manual.xlsx')
+            
+            if rows_to_annotate is None: rows_to_annotate = True
+
             rows_needing_annotation = tdf.df.loc[
-                (tdf.df[column.name].isna()) & 
-                (tdf.df['category']!='transfers' if (
-                    'category' in tdf.df.columns and not annotate_rows_that_are_transfers
-                    ) else [True]*len(tdf.df)) &
-                (tdf.df['exclude']==False if (
-                    'exclude' in tdf.df.columns and not annotate_rows_that_are_excluded
-                    ) else [True]*len(tdf.df)) &
-                (tdf.df['filename']!='manual.xlsx' if (
-                    'filename' in tdf.df.columns and not annotate_rows_that_are_from_manual
-                    ) else [True]*len(tdf.df)) 
+                rows_to_annotate & 
+                column_to_annotate_is_na & 
+                (category_is_not_transfer | annotate_rows_that_are_transfers) & 
+                (exclude_is_false | annotate_rows_that_are_excluded) & 
+                (filename_is_not_manual | annotate_rows_that_are_from_manual)
             ].index
-            if exclude_rows is not None: rows_needing_annotation = [row for row in rows_needing_annotation if not (row in exclude_rows)]
+            
             return rows_needing_annotation
 
         columns_to_display = columns_to_display or TransactionsDF.DISPLAY_COLUMNS_NAMES
@@ -456,7 +471,7 @@ class TransactionsDF():
         return copy
    
    
-    def copy(self, rows: List[int] = None, cols: List[str] = None):
+    def copy(self, rows: Optional[List[int]] = None, cols: Optional[List[str]] = None):
         """Returns a deep copy of self. 
         If a list is passed to cols, the returned copy contains only the columns listed in cols.
         This can be used to print only selected columns of a TransactionsDF.
@@ -676,9 +691,10 @@ class TransactionsDF():
             return copy
         
 
-    def to_csv(self, folder: Folder = None, filename: str = None, *args, **kwargs):
-        """Writes the transactions data frame to a csv file. The path is path_to_transactions/self.folder/self.filename. 
-        If the file already exists, the user is asked whether to overwrite it.
+    def to_csv(self, folder: Optional[Folder] = None, filename: Optional[str] = None, *args, **kwargs):
+        """Writes the transactions data frame to a csv file. The default path is 
+        path_to_transactions/self.folder/self.filename. If the file already exists, the user is asked 
+        whether to overwrite it.
         """
         folder = folder or self.folder
         filename = filename or self.filename
@@ -698,7 +714,9 @@ class TransactionsDF():
                         self.filename = self.filename.replace(".csv",f"_{number_string}.csv")
                         i += 1
                 if response == 'y': 
-                    response = input("Previous file will be overwritten. Type y again to confirm (or type anything else to go back)\t").lower()
+                    response = input(
+                        "Previous file will be overwritten. Type y again to confirm (or type anything else to go back)\t"
+                    ).lower()
                     if response == 'n': response = ''
 
         date_formatted_df = self.df.copy()
@@ -746,7 +764,7 @@ def assert_compatible_dates(tdf: TransactionsDF):
     )
 
 
-def assert_no_duplicate_rows(tdf: TransactionsDF, subset: List[str] = None):
+def assert_no_duplicate_rows(tdf: TransactionsDF, subset: Optional[List[str]] = None):
     """Raises an exception if there are duplicate rows in the TransactionsDF. 'subset' argument is a list of column names 
     to be passed to the pandas.DataFrame.duplicated method."""
     subset = subset or tdf.df.columns.tolist()
