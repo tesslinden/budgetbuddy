@@ -15,7 +15,7 @@ BudgetBuddy is a command-line app that I use to keep track of my spending habits
 
 BudgetBuddy is somewhat customized to my specific use cases and was not originally intended to be publicly useful. For that reason, there's not much in the way of documentation, although I'd be happy to answer questions. Some pieces of the package would be unnecessary for most people, but the base code could be useful to someone else.
 
-BudgetBuddy currently has some sections that are messy due to accumulated patches (especially plotting.py). I mean to clean them up eventually when I have a bit of time. :)
+BudgetBuddy currently has some sections that are messy due to accumulated patches (especially plotting.py and importing.py). I mean to refactor them eventually when I have a bit of time. :)
 
 
 ## Requirements
@@ -71,6 +71,11 @@ For more details, run `budgetbuddy --help`.
 
 ## Configuration
 
+Before you can use `budgetbuddy`, you need to create a `config.py` file with your own settings. You can do this by copying the `config.py.example` file and renaming it to `config.py`.
+
+```bash
+cp budgetbuddy/config.py.example budgetbuddy/config.py
+
 In "config.py", specify the paths to the relevant folders using the PATH_TO_* variables.
 [TODO: more here]
 
@@ -79,6 +84,7 @@ In "config.py", specify the paths to the relevant folders using the PATH_TO_* va
 * Write unit tests
 * Change the importing process so that old raw transactions files are ignored
 * Debug bar plot label positioning (note to self: I heard the adjustText library can do this automatically -- should look into it)
-* Expand the config.py file to include many parameters that are currently hard-coded elsewhere (e.g. spending & savings targets, plotting parameters, categories & subcategories)
+* Expand the config.py file to include many parameters that are currently hard-coded elsewhere (e.g. plotting parameters, categories & subcategories)
+* Refactor plotting.py and importing.py which are currently a little bit monstrous
 * Add feature: ability to edit merged transaction files via command line
 * Add feature: ability to annotate a transaction with a note
