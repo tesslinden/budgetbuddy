@@ -1,0 +1,69 @@
+import os
+from typing import List, Dict
+
+from .classes.folder import Folder
+
+# do not edit above this line
+####################################################################################  
+
+
+SALARY_TARGET = 5000 # monthly
+SAVINGS_TARGET = 0.1 # fraction of salary
+
+PATH_TO_BUDGET = 'my_path/budget.csv' # can use any file name
+PATH_TO_EXPORTS = 'my_path/exports' # can use any directory name
+PATH_TO_PLOTS = 'my_path/plots' # can use any directory name
+PATH_TO_TRANSACTIONS = 'my_path/transactions' # can use any directory name
+
+FOLDERS_LIST: List[Folder] = [
+    # example custom folder
+    Folder(
+        name='agre', 
+        prefix='Amex', 
+        suffix='.csv', 
+        columns_to_rename={'total': 'amount'}, 
+        account='Amex Green', 
+        flip_sign_of_amounts=True, 
+        prune_columns=True, 
+    ),
+    # example custom folder
+    Folder(
+        name='avis', 
+        prefix='History', 
+        suffix='.csv', 
+        columns_to_rename={'description': 'transaction'}, 
+        account='Ally Visa', 
+        reformat_amounts_alliant=True, 
+        flip_sign_of_amounts=True, 
+        prune_columns=True, 
+        filename_format=(
+            r"History-(?P<month>\d{2})(?P<day>\d{2})(?P<year>\d{2})-" +
+            r"(?P<hour>\d{2})(?P<minute>\d{2})(?P<seconds>\d{2})"
+        ),
+    ),
+    # a 'manual' folder must be included
+    Folder( 
+        name='manual',
+        prefix='manual',
+        suffix='.xlsx',
+        fill_false=True,
+    ),
+    # a 'merged' folder must be included
+    Folder( 
+        name='merged',
+        prefix='merged',
+        suffix='.csv',
+    ),
+]
+
+
+# do not edit below this line
+####################################################################################  
+
+for path in [PATH_TO_BUDGET, PATH_TO_EXPORTS, PATH_TO_PLOTS, PATH_TO_TRANSACTIONS]:
+    assert os.path.exists(path), f"Invalid path: '{path}'"
+
+for folder in FOLDERS_LIST:
+    assert os.path.exists(folder.path), f"Invalid path: '{folder.path}'"
+
+FOLDERS_DICT: Dict[str,Folder] = {folder.name: folder for folder in FOLDERS_LIST}
