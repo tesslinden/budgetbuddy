@@ -1,5 +1,6 @@
 # BudgetBuddy: a command-line budget tracking app
 
+
 ## Table of contents
 
 - Summary
@@ -8,6 +9,7 @@
 - Usage
 - Configuration
 - To Do
+
 
 ## Summary
 
@@ -31,6 +33,30 @@ To install this package, run the following command:
 pip install git+https://github.com/tesslinden/budgetbuddy.git
 ```
 
+For next steps, see "Configuration."
+
+
+## Configuration
+
+Before you can use `budgetbuddy`, you need to create a `config.py` file with your own settings. You can do this by copying the `config.py.example` file and renaming it to `config.py`.
+
+The `config.py.example` file is located in the `budgetbuddy` package directory. To find your python package directories, you can open an interactive python shell and run:
+
+```
+import site
+print(site.getsitepackages())
+```
+
+This should print a path to a directory called `site-packages`. Navigate to the `site-packages` directory, then create `config.py` by copying `config.py.example`: 
+
+```
+cp budgetbuddy/config.py.example budgetbuddy/config.py
+```
+
+Edit `config.py` to specify your salary and savings targets, as well as the paths to your transactions folders.
+
+TODO: explain the required folders and files
+
 
 ## Usage
 
@@ -52,13 +78,6 @@ BudgetBuddy can also be run in two other modes that are mutually exclusive with 
 
 For more details, run `budgetbuddy --help`.
 
-## Configuration
-
-Before you can use `budgetbuddy`, you need to create a `config.py` file with your own settings. You can do this by copying the `config.py.example` file and renaming it to `config.py`.
-
-In "config.py", specify the paths to the relevant folders using the PATH_TO_[folder] variables.
-
-TODO: more on configuration
 
 ## To Do
 
@@ -69,5 +88,3 @@ TODO: more on configuration
 * Refactor plotting.py and importing.py which are currently a little bit monstrous
 * Add feature: ability to edit merged transaction files via command line
 * Add feature: ability to annotate a transaction with a note
-* Double check which dependencies are required; automatically install dependencies 
-* Add installation option
