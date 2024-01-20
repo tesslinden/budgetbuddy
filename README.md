@@ -20,12 +20,16 @@ BudgetBuddy currently has some sections that are messy due to accumulated patche
 
 ## Requirements
 
-- **Python Version**: 3.11 or higher
+- Python 3.11 or higher
 
 
 ## Installation
 
-TODO
+To install this package, run the following command:
+
+```bash
+pip install git+https://github.com/tesslinden/budgetbuddy.git
+```
 
 
 ## Usage
