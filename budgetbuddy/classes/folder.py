@@ -12,7 +12,7 @@ class Folder:
     final_column_index: Optional[int] = None
     columns_to_rename: Optional[Dict[str,str]] = None
     account: Optional[str] = None
-    reformat_amounts_alliant: bool = False 
+    reformat_amounts_alliant: bool = False #TODO: replace this with a more robust, not-hardcoded solution. probably there is a python package that does it automatically.
     flip_sign_of_amounts: bool = False
     prune_columns: bool = False
     fill_false: bool = False

@@ -81,6 +81,7 @@ For more details, run `budgetbuddy --help`.
 
 ## To Do
 
+* Add --config argument to enter configuration setting mode; encode config as json instead of py
 * Write unit tests
 * Change the importing process so that old raw transactions files are ignored
 * Debug bar plot label positioning (note to self: I heard the adjustText library can do this automatically -- should look into it)
