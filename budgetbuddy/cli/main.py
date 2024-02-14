@@ -156,7 +156,13 @@ def BudgetBuddyCLI(
         if show_all_columns is None: show_all_columns = use_date_orig_for_sorting
         display_columns = list(merged.df.columns if show_all_columns else TransactionsDF.DISPLAY_COLUMNS_NAMES.copy())
         if use_date_orig_for_sorting: 
-            display_columns = misc.swap_positions_in_list(display_columns, 'date', 'date_orig')
+            leftmost_columns = ['date_override','date_orig']
+            assert all(col in display_columns for col in leftmost_columns), (
+                f"One or more of these columns is missing from display_columns: {leftmost_columns}"
+            )
+            for col in leftmost_columns[::-1]:
+                display_columns.insert(0, display_columns.pop(display_columns.index(col)))
+            display_columns.remove('date')
         display_filtered_transactions(
             merged,
             query=filter,
