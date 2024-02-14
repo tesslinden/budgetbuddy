@@ -154,10 +154,13 @@ def BudgetBuddyCLI(
         assert merged is not None, "merged is None."
         merged.sort_transactions(use_date_orig_for_sorting=use_date_orig_for_sorting)
         if show_all_columns is None: show_all_columns = use_date_orig_for_sorting
+        display_columns = list(merged.df.columns if show_all_columns else TransactionsDF.DISPLAY_COLUMNS_NAMES.copy())
+        if use_date_orig_for_sorting: 
+            display_columns = misc.swap_positions_in_list(display_columns, 'date', 'date_orig')
         display_filtered_transactions(
             merged,
             query=filter,
-            display_columns=merged.df.columns if show_all_columns else None, 
+            display_columns=display_columns, 
             sort_by=sort_by,
             use_date_orig_for_sorting=use_date_orig_for_sorting,
             show_sum=show_sum,
