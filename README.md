@@ -38,24 +38,7 @@ For next steps, see "Configuration."
 
 ## Configuration
 
-Before you can use `budgetbuddy`, you need to create a `config.py` file with your own settings. You can do this by copying the `config.py.example` file and renaming it to `config.py`.
-
-The `config.py.example` file is located in the `budgetbuddy` package directory. To find your python package directories, you can open an interactive python shell and run:
-
-```
-import site
-print(site.getsitepackages())
-```
-
-This should print a path to a directory called `site-packages`. Navigate to the `site-packages` directory, then create `config.py` by copying `config.py.example`: 
-
-```
-cp budgetbuddy/config.py.example budgetbuddy/config.py
-```
-
-Edit `config.py` to specify your salary and savings targets, as well as the paths to your transactions folders.
-
-TODO: explain the required folders and files
+TODO
 
 
 ## Usage
@@ -81,6 +64,7 @@ For more details, run `budgetbuddy --help`.
 
 ## To Do
 
+* when --use_date_orig_for_sorting is specified, display date_orig column to left of transaction column instead of date column
 * Add --config argument to enter configuration setting mode; encode config as json instead of py
 * Write unit tests
 * Change the importing process so that old raw transactions files are ignored
