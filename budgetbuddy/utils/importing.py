@@ -300,13 +300,13 @@ def merge_all(write: bool = True) -> TransactionsDF:
     unannotated.annotate_all()
     unannotated.sort_transactions()
     
-    print("\nNew rows to be added:")
-    print(unannotated.copy(cols=TransactionsDF.DISPLAY_COLUMNS_NAMES).column_to_last('filename').category_to_bottom('transfers'))
     print("\nRows to be deleted:")
     if len(deleted_transactions) > 0:
         print(deleted_transactions.copy(cols=TransactionsDF.DISPLAY_COLUMNS_NAMES).column_to_last('filename').category_to_bottom('transfers'))
     else:
         print("None")
+    print("\nRows to be added:")
+    print(unannotated.copy(cols=TransactionsDF.DISPLAY_COLUMNS_NAMES).column_to_last('filename').category_to_bottom('transfers'))
 
     response = ''
     while response not in ['y','n']:
