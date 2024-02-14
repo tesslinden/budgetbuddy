@@ -64,7 +64,6 @@ For more details, run `budgetbuddy --help`.
 
 ## To Do
 
-* when --use_date_orig_for_sorting is specified, display date_orig column to left of transaction column instead of date column
 * Add --config argument to enter configuration setting mode; encode config as json instead of py
 * Write unit tests
 * Change the importing process so that old raw transactions files are ignored
@@ -73,3 +72,4 @@ For more details, run `budgetbuddy --help`.
 * Refactor plotting.py and importing.py which are currently a little bit monstrous
 * Add feature: ability to edit merged transaction files via command line
 * Add feature: ability to annotate a transaction with a note
+* Use termcolor or similar to print tdfs with alternating row colors for better readability
