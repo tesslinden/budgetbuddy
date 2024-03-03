@@ -348,7 +348,7 @@ def plot_spending_lines(
     colspan: int,
     show_current: bool = True,
     show_today: bool = True,
-    yint: Optional[float] = None, # TODO: use this to set y intercept
+    yint: Optional[float] = None,
     title: Optional[str] = None,
     timestamp: datetime = datetime.today(),
     palette: Optional[Union[str,List[Tuple[float,float,float]]]] = None,

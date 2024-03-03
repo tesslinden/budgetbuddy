@@ -43,12 +43,12 @@ TODO
 
 ## Usage
 
-By default (if you run `budgetbuddy` with no arguments), BudgetBuddy will do the following:
-1. Import the most recent merged transactions file
-2. Import the manual transactions file and check if any new transactions are present or if any transactions have been deleted
-3. Import the raw transactions files and look for any new transactions not found in the merged file; if there are new transactions, ask the user to annotate them
-4. Make a new merged file with the deletions and additions identified in steps 2 & 3; save it in the merged transactions folder
-5. Import the budget file; use the budget file and the new merged file from step 4 to plot spending and income patterns for the past 6 months; save the plot in the plots folder 
+By default (if you run `budgetbuddy` with no arguments), BudgetBuddy will run in merge-and-plot mode, which does the following:
+1. **Import history:** Import the most recent merged transactions file
+2. **Import manual transactions:** Import the manual transactions file and check if any new transactions are present or if any transactions have been deleted
+3. **Import other transactions:** Import the raw transactions files and look for any new transactions not found in the merged file; if there are new transactions, ask the user to annotate them
+4. **Merge:** Make a new merged file with the deletions and additions identified in steps 2 & 3; save it in the merged transactions folder
+5. **Plot:** Import the budget file; use the budget file and the new merged file from step 4 to plot spending and income patterns for the past 6 months; save the plot in the plots folder 
 
 Here is an example output made with mock data: 
 ![Example output made with mock data](example_output_using_mock_data.png)
@@ -64,12 +64,12 @@ For more details, run `budgetbuddy --help`.
 
 ## To Do
 
-* Add --config argument to enter configuration setting mode; encode config as json instead of py
+* Rework config: add --config argument to enter configuration setting mode; encode config as json instead of py
 * Write unit tests
-* Change the importing process so that old raw transactions files are ignored
-* Debug bar plot label positioning (note to self: I heard the adjustText library can do this automatically -- should look into it)
-* Expand the config.py file to include many parameters that are currently hard-coded elsewhere (e.g. plotting parameters, categories & subcategories)
+* Rework importing process so that old raw transactions files are ignored
+* Debug bar plot label positioning (adjustText library might be useful)
+* Move more hard-coded parameters to config (e.g. plotting parameters, categories & subcategories)
 * Refactor plotting.py and importing.py which are currently a little bit monstrous
-* Add feature: ability to edit merged transaction files via command line
-* Add feature: ability to annotate a transaction with a note
+* Add ability to edit merged transaction files via command line
+* Add ability to annotate a transaction with a note
 * Use termcolor or similar to print tdfs with alternating row colors for better readability
