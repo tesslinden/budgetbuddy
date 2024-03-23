@@ -64,6 +64,7 @@ For more details, run `budgetbuddy --help`.
 
 ## To Do
 
+* Fix: when multiple merged files w/ same name exist, overwrite most recent one (e.g. "_02") NOT the one w/o suffix
 * Rework config: add --config argument to enter configuration setting mode; encode config as json instead of py
 * Write unit tests
 * Rework importing process so that old raw transactions files are ignored
