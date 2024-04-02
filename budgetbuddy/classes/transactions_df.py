@@ -75,7 +75,7 @@ class TransactionsDF():
         'groceries': {},
         'home': {},
         'income': {
-            'salary': ['gusto', 'fid', 'rover', 'walk', 'remotasks'],
+            'salary': ['trinet', 'gusto', 'fid', 'rover', 'walk', 'remotasks'],
             'rewards': []
         },
         'medical': {},
