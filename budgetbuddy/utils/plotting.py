@@ -394,8 +394,6 @@ def plot_spending_lines(
         palette=palette,
         linewidth=2,
     )
-    ax.set_ylim(yint*0.9 if yint else 0, ax.get_ylim()[1]*1.05)
-    ax.set_xlim(1, 31)
 
     num_months_shown = int(len(ax.lines)/2)
     current_month_index = num_months_shown-1
@@ -404,6 +402,9 @@ def plot_spending_lines(
     target_x = np.linspace(1,days_in_current_month,100)
     target_y = daily_target*target_x+(yint or 0)
     ax.plot(target_x, target_y, color='gray', linestyle='--', linewidth=1)
+
+    ax.set_ylim(yint*0.9 if yint else 0, ax.get_ylim()[1]*1.05)
+    ax.set_xlim(1, 31)
 
     if show_current:
         daily_spending_current_month = daily_spending[daily_spending['yrmo']==misc.get_yrmo(timestamp)]
@@ -588,14 +589,14 @@ def plot_totals_bars(
     #TODO: for spending & income, the references to plot_df['amount'].min() or .max() should be changed 
     # from the min/max of any subcategory to the min/max of the two subcategories together 
     if transaction_type=='savings':
-        ymin = min([-6500, plot_df['amount'].min()*(1.05 if plot_df['amount'].min() < 0 else 0.95)]) if show_negative_savings else 0
-        ymax = max([4000, plot_df['amount'].max()*(1.05 if plot_df['amount'].max() > 0 else 0.95)]) if show_negative_savings else 2500
+        ymin = min([-6000, plot_df['amount'].min()*(1.05 if plot_df['amount'].min() < 0 else 0.95)]) if show_negative_savings else 0
+        ymax = max([6000, plot_df['amount'].max()*(1.05 if plot_df['amount'].max() > 0 else 0.95)]) if show_negative_savings else 2500
     elif transaction_type=='spending': 
         ymax = 0 
         ymin = min([-12000, plot_df['amount'].min()*(1.05 if plot_df['amount'].min() < 0 else 0.95)])
     elif transaction_type=='income':
         ymin = 0
-        ymax = max([11200, plot_df['amount'].max()*(1.05 if plot_df['amount'].max() > 0 else 0.95)])
+        ymax = max([12000, plot_df['amount'].max()*(1.05 if plot_df['amount'].max() > 0 else 0.95)])
         
     ax.set_ylim(ymin,ymax)
     if ax.get_ylim()[0] < 0 and ax.get_ylim()[1] > 0:
