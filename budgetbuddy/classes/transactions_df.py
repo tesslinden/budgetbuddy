@@ -153,7 +153,7 @@ class TransactionsDF():
         return len(self.df)
 
 
-    def __repr__(self): # i think this is called when a variable is the final line of the code
+    def __repr__(self): # called when a variable is the final line of the code
         return (f"TransactionsDF(folder='{self.folder.name}', filename='{self.filename}', " +
                f"df.shape={self.df.shape}, df.columns={list(self.df.columns)})")
     
