@@ -65,6 +65,7 @@ For more details, run `budgetbuddy --help`.
 ## To Do
 
 * Reject invalid dates like 2024-03-39 similar to rejecting dates not in yyyy-mm-dd format
+* Add option to correct categories for relay transactions so I don't have to go back and edit them
 * Fix: when multiple merged files w/ same name exist, overwrite most recent one (e.g. "_02") NOT the one w/o suffix
 * Fix: in duplicate-dropping step, nan category prints as nan instead of ""
 * Don't show rows with nan category when asking user to accept category annotations 
