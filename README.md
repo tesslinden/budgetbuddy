@@ -64,6 +64,7 @@ For more details, run `budgetbuddy --help`.
 
 ## To Do
 
+* When importing manual transactions, throw clear error message if subcategory is missing when subcategory is expected  
 * Reject invalid dates like 2024-03-39 similar to rejecting dates not in yyyy-mm-dd format
 * Add option to correct categories for relay transactions so I don't have to go back and edit them
 * Fix: when multiple merged files w/ same name exist, overwrite most recent one (e.g. "_02") NOT the one w/o suffix
