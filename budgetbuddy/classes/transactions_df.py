@@ -59,11 +59,11 @@ class TransactionsDF():
     
     CATEGORIES_SUBCATEGORIES_SEARCHTERMS: Dict[str,Dict] = {
         'bills & utilities': {
-            'cell': ['verizon', 'vzw', 'at&t'],
+            'cell': ['at&t', 'att payment'],
             'internet': ['comcast', 'xfinity', 'internet'],
             'pge': ['pge','pgande', 'pg&e'],
-            'rent': ['rent'],
-            'other': [],
+            'rent': ['hoddinott', 'january rent','february rent','march rent','april rent','may rent','june rent','july rent','august rent','september rent','october rent','november rent','december rent'],
+            'other': ['lemonade','renters insurance', "renter's insurance", "renters' insurance"],
         },
         'dining & drinks': {},
         'entertainment': {},
