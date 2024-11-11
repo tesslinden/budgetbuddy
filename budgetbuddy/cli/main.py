@@ -20,7 +20,7 @@ def BudgetBuddyCLI(
     date_line: Optional[str] = None,
     filter: Optional[str] = None, 
     keyword: Optional[str] = None,
-    sort_by: Optional[List[str]] = None,
+    sort_by: Optional[Dict[str,bool]] = None,
     show_all_columns: Optional[bool] = None,
     use_date_orig_for_sorting: bool = False,
     show_sum: bool = False,
@@ -52,8 +52,9 @@ def BudgetBuddyCLI(
         Displays transactions with descriptions containing the specified keyword. --keyword 'search string' is equivalent 
         to --filter 'transaction.str.contains("search string",case=False)'.
 
-    --sort_by: List[str] = None
-        When used with --filter, sorts the displayed transactions by the specified columns.
+    --sort_by: Dict[str,bool] = None
+        When used with --filter, sorts the displayed transactions by the specified columns. example (sort by transaction, 
+        ascending=True): --sort_by "{'transaction': True}" 
 
     -u, --use_date_orig_for_sorting: bool = False
         When used with --filter, sorts the displayed transactions by the date_orig column instead of the date column.
